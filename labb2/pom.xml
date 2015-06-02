@@ -103,6 +103,22 @@
                 </dependency>
             </dependencies>
         </profile>
+        <profile>
+            <id>wildfy81-embedded</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-arquillian-container-embedded</artifactId>
+                    <version>8.1.0.Final</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-embedded</artifactId>
+                    <version>8.1.0.Final</version>
+                </dependency>
+            </dependencies>
+
+        </profile>
     </profiles>
     <dependencyManagement>
         <dependencies>
