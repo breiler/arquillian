@@ -1,20 +1,23 @@
 package se.cag.arquillian.labb3;
 
 
-import cucumber.runtime.arquillian.CukeSpace;
-import cucumber.runtime.arquillian.api.Features;
-import cucumber.runtime.arquillian.api.Glues;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Assert;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(CukeSpace.class)
-@Glues(BuyBooksSteps.class)
-@Features("buybooks.feature")
+import javax.inject.Inject;
+
+@RunWith(Arquillian.class)
 public class BuyBooksTest {
+
+    @Inject
+    private Cart cart;
 
     @Deployment
     public static Archive<?> createDeployment() {
@@ -22,5 +25,11 @@ public class BuyBooksTest {
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
                 .addClass(Book.class)
                 .addClass(Cart.class);
+    }
+
+    @Test
+    public void buyBooks() {
+        cart.addBook(new Book("A wonderful world", "James Newton", 100));
+        Assert.assertEquals(100, cart.getTotalPrice());
     }
 }
