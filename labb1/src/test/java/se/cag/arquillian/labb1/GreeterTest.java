@@ -1,33 +1,30 @@
 package se.cag.arquillian.labb1;
 
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
+
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.Mock;
 
-import javax.inject.Inject;
+import static org.mockito.Mockito.*;
+import static org.mockito.MockitoAnnotations.initMocks;
 
-@RunWith(Arquillian.class)
 public class GreeterTest {
 
-    @Inject
-    Greeter greeter;
+    @Mock
+    private PhraseBuilder phraseBuilder;
 
-    @Deployment
-    public static JavaArchive createDeployment() {
-        return ShrinkWrap.create(JavaArchive.class)
-                .addClass(Greeter.class)
-                .addClass(PhraseBuilder.class)
-                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+    private Greeter greeter;
+
+    @Before
+    public void setUp() {
+        initMocks(this);
+        when(phraseBuilder.buildPhrase(eq("hello"), anyString())).thenReturn("Hello, Earthling!");
+        greeter = new Greeter(phraseBuilder);
     }
 
     @Test
     public void shouldCreateGreeting() {
         Assert.assertEquals("Hello, Earthling!", greeter.createGreeting("Earthling"));
-        greeter.greet(System.out, "Earthling");
     }
 }
