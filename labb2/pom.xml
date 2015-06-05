@@ -16,6 +16,228 @@
     <name>labb2</name>
     <url>https://github.com/joacimb/arquillian</url>
 
+    <profiles>
+        <profile>
+            <id>arquillian-weld-ee-embedded</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.spec</groupId>
+                    <artifactId>jboss-javaee-6.0</artifactId>
+                    <version>1.0.0.Final</version>
+                    <type>pom</type>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.arquillian.container</groupId>
+                    <artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
+                    <version>1.0.0.CR3</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.weld</groupId>
+                    <artifactId>weld-core</artifactId>
+                    <version>1.1.5.Final</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                    <version>1.6.4</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>arquillian-glassfish-embedded</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.arquillian.container</groupId>
+                    <artifactId>arquillian-glassfish-embedded-3.1</artifactId>
+                    <version>1.0.0.CR3</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.main.extras</groupId>
+                    <artifactId>glassfish-embedded-all</artifactId>
+                    <version>3.1.2</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>arquillian-jbossas-managed</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.spec</groupId>
+                    <artifactId>jboss-javaee-6.0</artifactId>
+                    <version>1.0.0.Final</version>
+                    <type>pom</type>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.as</groupId>
+                    <artifactId>jboss-as-arquillian-container-managed</artifactId>
+                    <version>7.1.1.Final</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.arquillian.protocol</groupId>
+                    <artifactId>arquillian-protocol-servlet</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>arquillian-jbossas-remote</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.spec</groupId>
+                    <artifactId>jboss-javaee-6.0</artifactId>
+                    <version>1.0.0.Final</version>
+                    <type>pom</type>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.as</groupId>
+                    <artifactId>jboss-as-arquillian-container-remote</artifactId>
+                    <version>7.1.1.Final</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.arquillian.protocol</groupId>
+                    <artifactId>arquillian-protocol-servlet</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>wildfly-managed</id>
+
+            <properties>
+                <!-- Define properties to required Wildfly directories -->
+                <wildfly.version>8.1.0.Final</wildfly.version>
+                <wildfly.home>${user.home}/AppServers/wildfly-${wildfly.version}</wildfly.home>
+                <jboss.home>${wildfly.home}</jboss.home>
+            </properties>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.14.1</version>
+                        <configuration>
+                            <argLine>-Xmx1124m -Xms256m</argLine>
+                            <systemPropertyVariables>
+                                <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                                <jboss.home>${wildfly.home}</jboss.home>
+                                <module.path>${wildfly.home}/modules</module.path>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>2.18.1</version>
+                        <configuration>
+                            <argLine>-Xmx1024m -Xms256m</argLine>
+                            <systemPropertyVariables>
+                                <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                                <jboss.home>${wildfly.home}</jboss.home>
+                                <module.path>${wildfly.home}/modules</module.path>
+                            </systemPropertyVariables>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>integration-test</id>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>verify</id>
+                                <goals>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- plugin>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-maven2-plugin</artifactId>
+                        <version>1.4.6</version>
+                        <configuration>
+                            <container>
+                                <containerId>wildfly8x</containerId>
+                                <log>${basedir}/target/cargo.log</log>
+                                <output>${basedir}/target/wildfly.log</output>
+                                <zipUrlInstaller>
+                                    <url>http://download.jboss.org/wildfly/${wildfly.version}/${wildfly.version}.zip</url>
+                                    <downloadDir>${project.basedir}/../.cargo/downloads</downloadDir>
+                                    <extractDir>${project.basedir}/../.cargo/extracts</extractDir>
+                                </zipUrlInstaller>
+                            </container>
+                            <configuration>
+                                <properties>
+                                    <cargo.servlet.port>8080</cargo.servlet.port>
+                                    <cargo.logging>medium</cargo.logging>
+                                    <cargo.jvmargs>-Denv=test -Dtapestry.execution-mode=development</cargo.jvmargs>
+                                    <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
+                                </properties>
+                            </configuration>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>start-cargo</id>
+                                <phase>pre-integration-test</phase>
+                                <goals><goal>start</goal></goals>
+                                <configuration>
+                                    <deployables>
+                                        <deployable>
+                                            <location>${project.basedir}/target/${project.artifactId}-${project.version}</location>
+                                            <pingURL>http://localhost:8080/myApp</pingURL>
+                                            <pingTimeout>120000</pingTimeout>
+                                            <properties>
+                                                <context>myApp</context>
+                                            </properties>
+                                        </deployable>
+                                    </deployables>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>stop-cargo</id>
+                                <phase>post-integration-test</phase>
+                                <goals><goal>stop</goal></goals>
+                            </execution>
+                        </executions>
+                    </plugin -->
+                </plugins>
+            </build>
+
+            <!--
+                TODO: Replace with Wildfly non-embedded deps.
+            -->
+            <dependencies>
+                <dependency>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-arquillian-container-embedded</artifactId>
+                    <version>${wildfly.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-embedded</artifactId>
+                    <version>${wildfly.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -26,31 +248,6 @@
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec</groupId>
-            <artifactId>jboss-javaee-6.0</artifactId>
-            <version>1.0.0.Final</version>
-            <type>pom</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.container</groupId>
-            <artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
-            <version>1.0.0.CR3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.weld</groupId>
-            <artifactId>weld-core</artifactId>
-            <version>1.1.5.Final</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.6.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
