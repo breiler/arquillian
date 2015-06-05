@@ -2,30 +2,29 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
 
+    <!-- +=============================================== -->
+    <!-- | Section 1:  Project information                -->
+    <!-- +=============================================== -->
+    <modelVersion>4.0.0</modelVersion>
     <groupId>se.cag.arquillian</groupId>
     <artifactId>labb1</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jdk.version>1.7</jdk.version>
+        <java.encoding>UTF-8</java.encoding>
+        <project.build.sourceEncoding>${java.encoding}</project.build.sourceEncoding>
     </properties>
 
     <name>labb1</name>
     <url>https://github.com/joacimb/arquillian</url>
 
+    <!-- +=============================================== -->
+    <!-- | Section 2:  Dependency (management) settings   -->
+    <!-- +=============================================== -->
     <dependencies>
-
-        <!-- Java 6.0 EE -->
-        <dependency>
-            <groupId>org.jboss.spec</groupId>
-            <artifactId>jboss-javaee-6.0</artifactId>
-            <version>1.0.0.Final</version>
-            <type>pom</type>
-            <scope>provided</scope>
-        </dependency>
 
         <!-- JUnit -->
         <dependency>
@@ -43,14 +42,21 @@
         </dependency>
     </dependencies>
 
+    <!-- +=============================================== -->
+    <!-- | Section 3:  Build settings                     -->
+    <!-- +=============================================== -->
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.3</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
             <plugin>
@@ -59,4 +65,175 @@
             </plugin>
         </plugins>
     </build>
+
+    <!-- +=============================================== -->
+    <!-- | Section 5:  Profiles                           -->
+    <!-- +=============================================== -->
+    <profiles>
+        <profile>
+            <id>wildfly8_jee7</id>
+            <activation>
+                <property>
+                    <name>!jee.container</name>
+                </property>
+            </activation>
+
+            <dependencyManagement>
+                <dependencies>
+                    <!--
+                        JBoss distributes a complete set of Java EE 7 APIs including a Bill of Materials (BOM).
+                        A BOM specifies the versions of a "stack" (or a collection) of artifacts.
+                        We use this here so that we always get the correct versions of artifacts.
+                        Here we use the jboss-javaee-7.0-with-tools stack (you can read this as the JBoss stack of the
+                        Java EE 7 APIs, with some extras tools for your project, such as Arquillian for testing) and
+                        the jboss-javaee-7.0-with-hibernate stack you can read this as the JBoss stack of the Java EE
+                        7 APIs, with extras from the Hibernate family of projects).
+
+                        Define the version of JBoss' Java EE 7 APIs we want to import.
+                        All dependencies from org.jboss.spec will have their version defined by this BOM.
+                    -->
+                    <dependency>
+                        <groupId>org.wildfly.bom</groupId>
+                        <artifactId>jboss-javaee-7.0-with-tools</artifactId>
+                        <version>${version.jboss.bom}</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jboss.spec</groupId>
+                        <artifactId>jboss-javaee-7.0</artifactId>
+                        <version>${version.jboss.spec.javaee.7.0}</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                    </dependency>
+
+                    <!--
+                        All imports below are examples which should be used in individual leaf projects.
+                        They all retrieve their exact versions from the jboss-javaee-7.0-with-tools bom above.
+
+                        However, the maven-enforcer-plugin cannot extrapolate their dependencies unless explicitly
+                        provided. This implies that the variables given in the jboss-javaee-7.0-1.0.0.Final.pom et. al.
+                        must be provided explicitly again...
+
+                        // Lennart, 2014-06-14
+                     -->
+                    <!-- Example: CDI API import -->
+                    <!-- dependency>
+                        <groupId>javax.enterprise</groupId>
+                        <artifactId>cdi-api</artifactId>
+                        <scope>provided</scope>
+                    </dependency -->
+
+                    <!-- Example: Common Annotations API (JSR-250) import -->
+                    <!-- dependency>
+                        <groupId>org.jboss.spec.javax.annotation</groupId>
+                        <artifactId>jboss-annotations-api_1.2_spec</artifactId>
+                        <scope>provided</scope>
+                    </dependency -->
+
+                    <!-- Example: EJB API import -->
+                    <!-- dependency>
+                        <groupId>org.jboss.spec.javax.ejb</groupId>
+                        <artifactId>jboss-ejb-api_3.2_spec</artifactId>
+                        <scope>provided</scope>
+                    </dependency -->
+
+                    <!-- Example: JPA API import -->
+                    <!-- dependency>
+                        <groupId>org.hibernate.javax.persistence</groupId>
+                        <artifactId>hibernate-jpa-2.1-api</artifactId>
+                        <scope>provided</scope>
+                    </dependency -->
+                </dependencies>
+            </dependencyManagement>
+
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.spec.javax.ejb</groupId>
+                    <artifactId>jboss-ejb-api_3.2_spec</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>javax.enterprise</groupId>
+                    <artifactId>cdi-api</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate.javax.persistence</groupId>
+                    <artifactId>hibernate-jpa-2.1-api</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                    <version>4.3.7.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>jboss7_as_jee6</id>
+            <activation>
+                <!-- Use the JBoss 7 AS JEE 6 profile unless another profile is defined -->
+                <property>
+                    <name>jee.container</name>
+                    <value>jboss7</value>
+                </property>
+            </activation>
+
+            <properties>
+                <!-- Persistence properties -->
+                <datasource.prefix>java:jboss/</datasource.prefix>
+            </properties>
+
+            <dependencyManagement>
+                <dependencies>
+                    <!-- Java 6.0 EE -->
+                    <dependency>
+                        <groupId>org.jboss.spec</groupId>
+                        <artifactId>jboss-javaee-6.0</artifactId>
+                        <version>1.0.0.Final</version>
+                        <type>pom</type>
+                        <scope>provided</scope>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+
+            <dependencies>
+                <!--
+                    These dependencies are included in JBoss 7.2.0.Final (and therefore specified by the
+                    jboss-javaee-6.0), so we should use provided scope for them.
+                -->
+                <!-- CDI API. -->
+                <dependency>
+                    <groupId>javax.enterprise</groupId>
+                    <artifactId>cdi-api</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+
+                <!-- Common Annotations API (JSR-250). -->
+                <dependency>
+                    <groupId>org.jboss.spec.javax.annotation</groupId>
+                    <artifactId>jboss-annotations-api_1.1_spec</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.spec.javax.transaction</groupId>
+                    <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.spec.javax.ejb</groupId>
+                    <artifactId>jboss-ejb-api_3.1_spec</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.spec.javax.servlet</groupId>
+                    <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>
