@@ -9,9 +9,9 @@
             <property name="jbossHome">/Users/lj/AppServers/wildfly-8.1.0.Final</property>
         </configuration>
     </container -->
-    <container qualifier="wildfly81" default="true">
+    <!--container qualifier="wildfly81" default="true">
         <configuration>
             <property name="jbossHome">/Users/lj/AppServers/wildfly-8.1.0.Final</property>
         </configuration>
-    </container>
+    </container-->
 </arquillian>
