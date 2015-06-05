@@ -14,8 +14,7 @@ import javax.inject.Inject;
 @RunWith(Arquillian.class)
 public class GreeterTest {
 
-    @Inject
-    se.cag.arquillian.labb2.Greeter greeter;
+    @Inject se.cag.arquillian.labb2.Greeter greeter;
 
     @Deployment
     public static JavaArchive createDeployment() {
